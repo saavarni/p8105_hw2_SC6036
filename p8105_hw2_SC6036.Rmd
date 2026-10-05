@@ -1,0 +1,24 @@
+---
+title: "p8105_hw2_SC6036"
+output: github_document
+date: "2026-10-05"
+---
+```{r}
+library(tidyverse)
+```
+
+```{r}
+nycTransit = 
+  read_csv("data/NYCTransit.csv") |> 
+  select("Line", "Station Name", "Station Latitude", "Station Longitude", "Route1", "Route2", "Route3",
+         "Route4","Route5","Route6","Route7","Route8","Route9","Route10","Entry","Vending","Entrance Type", "ADA") |> 
+  janitor::clean_names() |> 
+  mutate(
+    entry = case_match(
+      entry, 
+      "YES" ~ 1,
+      "NO" ~ 2
+    )
+  )
+```
+
