@@ -6,6 +6,7 @@ date: "2026-10-05"
 
 ```{r}
 library(tidyverse)
+library(readxl)
 ```
 
 # Question 1
@@ -28,17 +29,19 @@ nycTransit
 This data set has 18 columns and 1,868 rows, with selected variables "Line", "Station Name", "Station Latitude", "Station Longitude", Route 1-10 "Entry", "Vending", "Entrance Type", "ADA". So far I have cleaned the variable names, selected the variables we want to look at, and used the mutate function to code 1 to "YES" and 2 to "NO". I wouldn't consider this data tidy because there are many binary variables aside from "Entry"; such as "ADA" and "Vending". There is also many NA values and I would want to look further into that to see if they can be dropped from the data set. I also would make the routes less redundant using pivot_longer(). 
 
 ```{r}
+# distinct station
 nycTransit |> 
   distinct(line, station_name) # or
 
 distinct(nycTransit, line, station_name, keep_all = T)
 
+# distinct ADA compliant stations 
 filter(nycTransit, ada == "FALSE")
 filter(nycTransit, ada == "TRUE")
 
+# no vending and entry allowed / all entrances with no vending 
 nrow(filter(nycTransit, vending == "NO", entry == 1)) / 
   nrow(filter(nycTransit, vending == "NO"))
-# no vending and entry allowed / all entrances with no vending 
 ```
 There are 465 distinct stations. Of these, only 468 stations are ADA compliant. About 37.7% of station entrances and exists without vending allow entrance.
 
@@ -53,12 +56,40 @@ nycTransitTidy <- nycTransit |>
   )
 nycTransitTidy
 
+# distinct stations serving A
 nycTransitTidy |> 
   filter(route_name == "A") |> 
   distinct(station_name, line)
 
+# distinct stations serving A and ADA compliant
 nycTransitTidy |> 
   filter(route_name == "A", ada == "TRUE") |> 
   distinct(station_name, line)
 ```
 There are 60 distinct stations that serve the A train. Of those, 17 are ADA compliant
+
+# Question 2
+```{r}
+TrashWheel <- read_excel("data/202509 Trash Wheel Collection Data.xlsx", range = "A2:N709")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
