@@ -70,14 +70,55 @@ There are 60 distinct stations that serve the A train. Of those, 17 are ADA comp
 
 # Question 2
 ```{r}
-TrashWheel <- read_excel("data/202509 Trash Wheel Collection Data.xlsx", range = "A2:N709")
+# Cleaning data sets 
+
+MrTrashWheel <- read_excel("data/202509 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N709") |> 
+  janitor::clean_names() |> 
+  drop_na(dumpster) |> 
+  mutate(
+    sports_balls = as.integer(round(sports_balls)),
+    trash_wheel = "Mr. Trash Wheel",
+    year = as.integer(year)
+  )
+
+ProfTrashWheel <- read_excel("data/202509 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M134") |> 
+  janitor::clean_names() |> 
+  drop_na(dumpster) |> 
+  mutate(
+    trash_wheel = "Professor Trash Wheel",
+    year = as.integer(year)
+  )
+
+Gwynnda <- read_excel("data/202509 Trash Wheel Collection Data.xlsx", sheet = "Gwynns Falls Trash Wheel", range = "A2:L351") |> 
+  janitor::clean_names() |> 
+  drop_na(dumpster) |> 
+  mutate(
+    trash_wheel = "Gwynnda",
+    year = as.integer(year)
+  )
+# making the year type consistent
 ```
 
+```{r}
+# Combining
+trashWheels <- bind_rows(MrTrashWheel, ProfTrashWheel, Gwynnda) |> 
+  relocate(trash_wheel)
+```
+The combined data set is 15 columns by 1,188 rows. Some key variables are "trash_wheel", "year", "dumpster", "homes_powered", and "cigarette_butts". 
 
+```{r}
+trashWheels |> 
+  filter(trash_wheel == "Mr. Trash Wheel") |> 
+  summarize(total_weight = sum(weight_tons, na.rm = T))
 
+trashWheels |> 
+  filter(trash_wheel == "Gwynnda") |> 
+  filter(month == "June" & year == 2022) |> 
+  summarize(cigarette_butts = sum(cigarette_butts, na.rm = T))
+```
+The total weight of trash collected by Mr. Trash Wheel is 2283.84 (lbs?) and in June 2022, Gwynnda colleged 18120 cigarette butts. 
 
-
-
+## Question 3
 
 
 
