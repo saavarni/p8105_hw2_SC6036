@@ -116,15 +116,42 @@ trashWheels |>
   filter(month == "June" & year == 2022) |> 
   summarize(cigarette_butts = sum(cigarette_butts, na.rm = T))
 ```
-The total weight of trash collected by Mr. Trash Wheel is 2283.84 (lbs?) and in June 2022, Gwynnda colleged 18120 cigarette butts. 
+The total weight of trash collected by Mr. Trash Wheel is 2283.84 (lbs?) and in June 2022, Gwynnda collected 18120 cigarette butts. 
 
 ## Question 3
+```{r}
+MCI_baseline_df <- read_csv("data/MCI_baseline.csv", skip = 1, na = c("", "NA", "Na", ".")) |>  
+  #removing all types of NA and skipping the data dictionary line
+  janitor::clean_names() |> #cleaning up names
+  mutate(
+    sex = factor(case_match(sex, 0 ~ "Female", 1 ~ "Male")), # matching 0 as female and 1 as male
+    apoe4 = factor(case_match(apoe4, 0 ~ "Non-carrier", 1 ~ "Carrier")) # matching 0 as non carrier and 1 as carrier
+  )
 
+## removing those who already have MCI (failing to meet criteria at baseline)
+mci_baseline <- MCI_baseline_df |> 
+  filter(is.na(age_at_onset) | age_at_onset > current_age) # onset age at or below baseline age fails the inclusion criteria
 
+mean(mci_baseline$current_age)
 
+mci_baseline |>
+  filter(sex == "Female") |>
+  summarize(mean(apoe4 == "Carrier"))
+```
+There are a total of 483 participants, 479 of which are MCI free at baseline. The average age is ~65 years old. Proportion of women in the study who are APOE4 carriers is 0.3, or 30%. (63/210 women)
 
-
-
+```{r}
+mci_amyloid <- read_csv("data/mci_amyloid.csv", skip = 1, na = c("", "NA", "Na")) |> # removing all types of NA, "Na" appears in a few rows
+  janitor::clean_names() |> #cleaning up names
+  rename(id = study_id, time_0 = baseline) |>
+  pivot_longer(
+    cols = time_0:time_8,
+    names_to = "visit_time",
+    names_prefix = "time_",
+    values_to = "amyloid_ratio"
+  ) |>
+  mutate(visit_time = as.numeric(visit_time)) # years since baseline
+```
 
 
 
