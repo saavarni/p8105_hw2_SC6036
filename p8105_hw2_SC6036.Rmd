@@ -72,24 +72,25 @@ There are 60 distinct stations that serve the A train. Of those, 17 are ADA comp
 ```{r}
 # Cleaning data sets 
 
-MrTrashWheel <- read_excel("data/202509 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N709") |> 
+MrTrashWheel <- read_excel("data/202610 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N742") |> 
   janitor::clean_names() |> 
   drop_na(dumpster) |> 
   mutate(
     sports_balls = as.integer(round(sports_balls)),
     trash_wheel = "Mr. Trash Wheel",
-    year = as.integer(year)
+    year = as.integer(year) #read in as text for consistency in the combining step
   )
 
-ProfTrashWheel <- read_excel("data/202509 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M134") |> 
+ProfTrashWheel <- read_excel("data/202610 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M139") |> 
   janitor::clean_names() |> 
   drop_na(dumpster) |> 
   mutate(
     trash_wheel = "Professor Trash Wheel",
-    year = as.integer(year)
+    plastic_bottles = as.numeric(plastic_bottles), # one cell says "dive"
+    year = as.integer(year) 
   )
 
-Gwynnda <- read_excel("data/202509 Trash Wheel Collection Data.xlsx", sheet = "Gwynns Falls Trash Wheel", range = "A2:L351") |> 
+Gwynnda <- read_excel("data/202610 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda the Good Wheel of the W", range = "A2:L394") |> 
   janitor::clean_names() |> 
   drop_na(dumpster) |> 
   mutate(
@@ -104,11 +105,11 @@ Gwynnda <- read_excel("data/202509 Trash Wheel Collection Data.xlsx", sheet = "G
 trashWheels <- bind_rows(MrTrashWheel, ProfTrashWheel, Gwynnda) |> 
   relocate(trash_wheel)
 ```
-The combined data set is 15 columns by 1,188 rows. Some key variables are "trash_wheel", "year", "dumpster", "homes_powered", and "cigarette_butts". 
+The combined data set is 15 columns by 1,269 rows. Some key variables are "trash_wheel", "year", "dumpster", "homes_powered", and "cigarette_butts" with one row per dumpster brought in by each of the trash wheels. 
 
 ```{r}
 trashWheels |> 
-  filter(trash_wheel == "Mr. Trash Wheel") |> 
+  filter(trash_wheel == "Professor Trash Wheel") |> 
   summarize(total_weight = sum(weight_tons, na.rm = T))
 
 trashWheels |> 
@@ -116,7 +117,7 @@ trashWheels |>
   filter(month == "June" & year == 2022) |> 
   summarize(cigarette_butts = sum(cigarette_butts, na.rm = T))
 ```
-The total weight of trash collected by Mr. Trash Wheel is 2283.84 (lbs?) and in June 2022, Gwynnda collected 18120 cigarette butts. 
+The total weight of trash collected by Professor Trash Wheel is 294.96 tons and in June 2022, Gwynnda collected 18120 cigarette butts. 
 
 ## Question 3
 ```{r}
